@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SKILLO | Interactive Learning & Madrasa Support</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            blue: '#1e3a8a',
+                            light: '#eff6ff',
+                            emerald: '#059669',
+                            emeraldLight: '#ecfdf5',
+                            dark: '#0f172a'
+                        }
+                    },
+                    animation: {
+                        'blob': 'blob 7s infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'float-delayed': 'float 6s ease-in-out 3s infinite',
+                    },
+                    keyframes: {
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .delay-100 { transition-delay: 100ms; }
+        .delay-200 { transition-delay: 200ms; }
+        
+        .cursor::after {
+            content: '|';
+            animation: blink 1s step-start infinite;
+            color: #fbbf24;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        .tab-content {
+            display: none;
+            animation: fadeInTab 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .tab-content.active {
+            display: block;
+        }
+        @keyframes fadeInTab {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+        }
+    </style>
+</head>
+<body class="font-sans text-gray-800 antialiased bg-gray-50 overflow-x-hidden selection:bg-brand-blue selection:text-white">
+
+    <!-- Floating Action Buttons (Always Visible Easy Access) -->
+    <div class="fixed bottom-6 right-6 z-[100] flex flex-col gap-4 items-end">
+        <!-- WhatsApp -->
+        <a href="https://wa.me/917510863624" target="_blank" rel="noopener noreferrer" class="group flex items-center gap-3 bg-green-500 text-white p-3 md:px-5 md:py-3 rounded-full shadow-xl hover:bg-green-600 hover:scale-105 transition-all duration-300">
+            <span class="hidden md:block font-semibold">WhatsApp Us</span>
+            <i class="fab fa-whatsapp text-2xl md:text-xl"></i>
+        </a>
+        <!-- Google Form Register -->
+        <a href="https://forms.gle/E7SHUnpi4fDL3iUh8" target="_blank" rel="noopener noreferrer" class="group flex items-center gap-3 bg-brand-blue text-white p-4 md:px-6 md:py-4 rounded-full shadow-2xl hover:bg-blue-800 hover:scale-105 transition-all duration-300 ring-4 ring-blue-500/30 animate-pulse hover:animate-none">
+            <span class="hidden md:block font-bold text-lg">Register Now</span>
+            <i class="fas fa-clipboard-list text-2xl md:text-xl"></i>
+        </a>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="glass sticky top-0 z-50 transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20 items-center">
+                <div class="flex items-center cursor-pointer" onclick="window.scrollTo(0,0)">
+                    <span class="text-3xl font-bold text-brand-blue tracking-tight hover:scale-105 transition-transform duration-300">SKILLO<span class="text-brand-emerald">.</span></span>
+                </div>
+                <div class="hidden lg:flex items-center space-x-10">
+                    <a href="#academics" class="text-gray-700 hover:text-brand-blue font-semibold transition relative group">
+                        Academics
+                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-blue transition-all group-hover:w-full"></span>
+                    </a>
+                    <a href="#madrasa" class="text-gray-700 hover:text-brand-emerald font-semibold transition relative group">
+                        Madrasa Support
+                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-emerald transition-all group-hover:w-full"></span>
+                    </a>
+                    <a href="#services" class="text-gray-700 hover:text-brand-blue font-semibold transition relative group">
+                        Services
+                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-blue transition-all group-hover:w-full"></span>
+                    </a>
+                    <a href="https://forms.gle/E7SHUnpi4fDL3iUh8" target="_blank" class="bg-brand-blue text-white px-6 py-2.5 rounded-full font-bold hover:bg-blue-800 hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-2">
+                        Enroll Now
+                    </a>
+                </div>
+                <!-- Mobile menu button -->
+                <div class="flex items-center lg:hidden">
+                    <button id="mobile-menu-btn" class="text-gray-800 hover:text-brand-blue focus:outline-none transition-colors p-2">
+                        <i class="fas fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden lg:hidden bg-white border-t border-gray-100 absolute w-full shadow-2xl">
+            <div class="px-4 py-4 space-y-2">
+                <a href="#academics" class="block px-4 py-3 text-base font-semibold text-gray-800 hover:text-brand-blue hover:bg-blue-50 rounded-xl transition-colors mobile-link">Academics</a>
+                <a href="#madrasa" class="block px-4 py-3 text-base font-semibold text-gray-800 hover:text-brand-emerald hover:bg-emerald-50 rounded-xl transition-colors mobile-link">Madrasa Support</a>
+                <a href="#services" class="block px-4 py-3 text-base font-semibold text-gray-800 hover:text-brand-blue hover:bg-blue-50 rounded-xl transition-colors mobile-link">Services</a>
+                <a href="https://forms.gle/E7SHUnpi4fDL3iUh8" target="_blank" class="block mt-4 px-4 py-3 text-base font-bold text-white bg-brand-blue text-center rounded-xl hover:bg-blue-800 transition-colors shadow-lg">Open Registration Form</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Modern Hero Section -->
+    <header class="relative bg-brand-blue text-white overflow-hidden min-h-[90vh] flex items-center">
+        <!-- Animated Background Blobs -->
+        <div class="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
+            <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-500/40 rounded-full mix-blend-screen filter blur-[80px] animate-blob"></div>
+            <div class="absolute top-[20%] right-[-10%] w-[50%] h-[50%] bg-emerald-500/30 rounded-full mix-blend-screen filter blur-[100px] animate-blob" style="animation-delay: 2s;"></div>
+            <div class="absolute bottom-[-20%] left-[20%] w-[60%] h-[60%] bg-indigo-500/30 rounded-full mix-blend-screen filter blur-[100px] animate-blob" style="animation-delay: 4s;"></div>
+        </div>
+        
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 w-full z-10 text-center lg:text-left flex flex-col lg:flex-row items-center gap-12">
+            <div class="lg:w-3/5 reveal active">
+                <div class="inline-flex items-center py-1.5 px-4 rounded-full bg-blue-800/50 border border-blue-400/30 text-blue-100 text-sm font-semibold mb-6 backdrop-blur-sm shadow-sm">
+                    <span class="w-2 h-2 rounded-full bg-green-400 mr-2 animate-pulse"></span> KG to Degree Level Support
+                </div>
+                <h1 class="text-4xl md:text-5xl lg:text-7xl font-bold leading-tight mb-6">
+                    Personalized <br />
+                    <span class="text-yellow-400 cursor h-[1.2em] inline-block" id="typewriter">Learning</span>
+                </h1>
+                <p class="text-lg md:text-xl text-blue-100 max-w-2xl mx-auto lg:mx-0 mb-10 font-light leading-relaxed">
+                    A holistic program offering individualized academic guidance, comprehensive skill development, and dedicated Madrasa support for every student's success.
+                </p>
+                <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 justify-center lg:justify-start">
+                    <a href="https://forms.gle/E7SHUnpi4fDL3iUh8" target="_blank" class="bg-white text-brand-blue px-8 py-4 rounded-full font-bold text-lg hover:bg-gray-100 transform hover:-translate-y-1 transition-all duration-300 shadow-xl text-center flex items-center justify-center group">
+                        Register Now <i class="fas fa-external-link-alt ml-2 transform group-hover:scale-110 transition-transform"></i>
+                    </a>
+                    <a href="#academics" class="bg-blue-900/40 backdrop-blur-md border border-blue-400/30 text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-blue-800 transition-all duration-300 shadow-lg text-center">
+                        Explore Programs
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Modern 3D Floating Cards Illustration (Desktop) -->
+            <div class="lg:w-2/5 relative h-[400px] w-full hidden lg:block perspective-1000">
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <!-- Card 1 -->
+                    <div class="bg-white/10 backdrop-blur-lg border border-white/20 p-6 rounded-2xl w-64 shadow-2xl transform rotate-[5deg] hover:rotate-0 transition-transform duration-500 cursor-pointer absolute z-20 top-0 left-0 animate-float">
+                        <div class="w-14 h-14 bg-yellow-400 rounded-full flex items-center justify-center mb-4 text-brand-blue text-2xl shadow-lg"><i class="fas fa-graduation-cap"></i></div>
+                        <h3 class="font-bold text-xl mb-2 text-white">Academics</h3>
+                        <p class="text-blue-100 text-sm">Expert tutoring across all major subjects.</p>
+                    </div>
+                    <!-- Card 2 -->
+                    <div class="bg-brand-emerald/90 backdrop-blur-lg border border-emerald-400/30 p-6 rounded-2xl w-64 shadow-2xl transform -rotate-[5deg] hover:rotate-0 transition-transform duration-500 cursor-pointer absolute z-10 bottom-0 right-0 animate-float-delayed">
+                        <div class="w-14 h-14 bg-white rounded-full flex items-center justify-center mb-4 text-brand-emerald text-2xl shadow-lg"><i class="fas fa-mosque"></i></div>
+                        <h3 class="font-bold text-xl mb-2 text-white">Madrasa</h3>
+                        <p class="text-emerald-100 text-sm">Quran, Arabic & Islamic Studies.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Academic Programs Section (Tabs) -->
+    <section id="academics" class="py-24 bg-white relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 reveal">
+            <div class="text-center mb-12">
+                <span class="text-brand-blue font-semibold tracking-wider uppercase text-sm">Our Curriculum</span>
+                <h2 class="text-3xl md:text-5xl font-bold text-gray-900 mt-2 mb-4">Academic Programs</h2>
+                <div class="w-24 h-1.5 bg-brand-blue mx-auto rounded-full mb-6"></div>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">Select a grade level below to explore specialized support tailored to every stage of a student's educational journey.</p>
+            </div>
+
+            <!-- Tab Buttons (Desktop Optimized) -->
+            <div class="flex space-x-2 md:space-x-4 overflow-x-auto no-scrollbar pb-6 justify-start xl:justify-center mb-8 border-b border-gray-100">
+                <button onclick="openTab('kg')" id="btn-kg" class="tab-btn active px-6 py-3 rounded-full font-medium whitespace-nowrap transition-all duration-300 bg-brand-blue text-white shadow-md flex items-center gap-2">
+                    <i class="fas fa-shapes text-yellow-300"></i> Kindergarten
+                </button>
+                <button onclick="openTab('primary')" id="btn-primary" class="tab-btn px-6 py-3 rounded-full font-medium whitespace-nowrap transition-all duration-300 text-gray-600 hover:bg-gray-100 flex items-center gap-2">
+                    <!-- Professional Academic Symbol -->
+                    <i class="fas fa-pencil-ruler text-brand-blue"></i> Primary (1-5)
+                </button>
+                <button onclick="openTab('middle')" id="btn-middle" class="tab-btn px-6 py-3 rounded-full font-medium whitespace-nowrap transition-all duration-300 text-gray-600 hover:bg-gray-100 flex items-center gap-2">
+                    <i class="fas fa-book-reader text-brand-blue"></i> Middle (6-8)
+                </button>
+                <button onclick="openTab('high')" id="btn-high" class="tab-btn px-6 py-3 rounded-full font-medium whitespace-nowrap transition-all duration-300 text-gray-600 hover:bg-gray-100 flex items-center gap-2">
+                    <i class="fas fa-user-graduate text-brand-blue"></i> High School
+                </button>
+                <button onclick="openTab('plus')" id="btn-plus" class="tab-btn px-6 py-3 rounded-full font-medium whitespace-nowrap transition-all duration-300 text-gray-600 hover:bg-gray-100 flex items-center gap-2">
+                    <i class="fas fa-chart-line text-brand-blue"></i> Plus 1 & 2
+                </button>
+                <button onclick="openTab('degree')" id="btn-degree" class="tab-btn px-6 py-3 rounded-full font-medium whitespace-nowrap transition-all duration-300 text-gray-600 hover:bg-gray-100 flex items-center gap-2">
+                    <i class="fas fa-university text-brand-blue"></i> Degree Level
+                </button>
+            </div>
+
+            <!-- Tab Contents -->
+            <div class="bg-gray-50 rounded-3xl p-8 md:p-12 border border-gray-100 shadow-sm relative overflow-hidden">
+                <!-- Background Decoration -->
+                <i class="fas fa-graduation-cap absolute -right-10 -bottom-10 text-[200px] text-gray-200/50 transform -rotate-12 pointer-events-none"></i>
+
+                <!-- KG Content -->
+                <div id="kg" class="tab-content active z-10 relative">
+                    <div class="flex flex-col md:flex-row items-center gap-10">
+                        <div class="md:w-1/3">
+                            <div class="w-24 h-24 bg-blue-100 rounded-2xl flex items-center justify-center mb-6 shadow-inner transform -rotate-6">
+                                <i class="fas fa-shapes text-5xl text-brand-blue"></i>
+                            </div>
+                            <h3 class="text-3xl font-bold text-gray-900 mb-2">Kindergarten</h3>
+                            <p class="text-gray-600">Building a strong foundation through engaging and interactive learning methods.</p>
+                        </div>
+                        <div class="md:w-2/3 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition-shadow flex items-center group cursor-default border border-gray-50">
+                                <div class="w-10 h-10 bg-green-100 text-green-600 rounded-full flex items-center justify-center mr-4 group-hover:scale-110 transition-transform"><i class="fas fa-sort-numeric-up-alt"></i></div>
+                                <span class="font-medium text-gray-800">Early literacy & numeracy</span>
+                            </div>
+                            <div class="bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition-shadow flex items-center group cursor-default border border-gray-50">
+                                <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mr-4 group-hover:scale-110 transition-transform"><i class="fas fa-font"></i></div>
+                                <span class="font-medium text-gray-800">Phonics & language</span>
+                            </div>
+                            <div class="bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition-shadow flex items-center group cursor-default border border-gray-50">
+                                <div class="w-10 h-10 bg-yellow-100 text-yellow-600 rounded-full flex items-center justify-center mr-4 group-hover:scale-110 transition-transform"><i class="fas fa-pencil-alt"></i></div>
+                                <span class="font-medium text-gray-800">Reading readiness</span>
+                            </div>
+                            <div class="bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition-shadow flex items-center group cursor-default border border-gray-50">
+                                <div class="w-10 h-10 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mr-4 group-hover:scale-110 transition-transform"><i class="fas fa-puzzle-piece"></i></div>
+                                <span class="font-medium text-gray-800">Interactive activities</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Primary Content -->
+                <div id="primary" class="tab-content z-10 relative">
+                    <div class="flex flex-col md:flex-row items-center gap-10">
+                        <div class="md:w-1/3">
+                            <div class="w-24 h-24 bg-blue-100 rounded-2xl flex items-center justify-center mb-6 shadow-inner transform -rotate-6">
+                                <!-- Professional Academic Symbol -->
+                                <i class="fas fa-pencil-ruler text-5xl text-brand-blue"></i>
+                            </div>
+                            <h3 class="text-3xl font-bold text-gray-900 mb-2">Primary School</h3>
+                            <span class="inline-block bg-blue-100 text-brand-blue px-3 py-1 rounded-full text-sm font-semibold mb-4">Grades 1–5</span>
+                            <p class="text-gray-600">Strengthening core concepts and developing critical comprehension skills.</p>
+                        </div>
+                        <div class="md:w-2/3 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-50 flex items-start"><i class="fas fa-check-circle text-brand-emerald mt-1 mr-3"></i><span class="text-gray-800 font-medium">Foundation strengthening</span></div>
+                            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-50 flex items-start"><i class="fas fa-check-circle text-brand-emerald mt-1 mr-3"></i><span class="text-gray-800 font-medium">Mathematics support</span></div>
+                            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-50 flex items-start"><i class="fas fa-check-circle text-brand-emerald mt-1 mr-3"></i><span class="text-gray-800 font-medium">English language development</span></div>
+                            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-50 flex items-start"><i class="fas fa-check-circle text-brand-emerald mt-1 mr-3"></i><span class="text-gray-800 font-medium">Reading & comprehension</span></div>
+                            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-50 flex items-start sm:col-span-2"><i class="fas fa-check-circle text-brand-emerald mt-1 mr-3"></i><span class="text-gray-800 font-medium">Homework & assignment assistance</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Middle Content -->
+                <div id="middle" class="tab-content z-10 relative">
+                    <div class="flex flex-col md:flex-row items-center gap-10">
+                        <div class="md:w-1/3">
+                            <div class="w-24 h-24 bg-blue-100 rounded-2xl flex items-center justify-center mb-6 shadow-inner transform -rotate-6">
+                                <i class="fas fa-book-reader text-5xl text-brand-blue"></i>
+                            </div>
+                            <h3 class="text-3xl font-bold text-gray-900 mb-2">Middle School</h3>
+                            <span class="inline-block bg-blue-100 text-brand-blue px-3 py-1 rounded-full text-sm font-semibold mb-4">Grades 6–8</span>
+                            <p class="text-gray-600">Building academic confidence and refining study skills for higher learning.</p>
+                        </div>
+                        <div class="md:w-2/3 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-50 flex items-start"><i class="fas fa-microscope text-brand-blue mt-1 mr-3"></i><span class="text-gray-800 font-medium">Subject-focused support</span></div>
+                            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-50 flex items-start"><i class="fas fa-tasks text-brand-blue mt-1 mr-3"></i><span class="text-gray-800 font-medium">Study skills development</span></div>
+                            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-50 flex items-start"><i class="fas fa-child text-brand-blue mt-1 mr-3"></i><span class="text-gray-800 font-medium">Academic confidence building</span></div>
+                            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-50 flex items-start"><i class="fas fa-file-alt text-brand-blue mt-1 mr-3"></i><span class="text-gray-800 font-medium">Early exam preparation</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- High Content -->
+                <div id="high" class="tab-content z-10 relative">
+                    <div class="flex flex-col md:flex-row items-center gap-10">
+                        <div class="md:w-1/3">
+                            <div class="w-24 h-24 bg-blue-100 rounded-2xl flex items-center justify-center mb-6 shadow-inner transform -rotate-6">
+                                <i class="fas fa-user-graduate text-5xl text-brand-blue"></i>
+                            </div>
+                            <h3 class="text-3xl font-bold text-gray-900 mb-2">High School</h3>
+                            <span class="inline-block bg-brand-emerald text-white px-3 py-1 rounded-full text-sm font-semibold mb-4">Grades 9–10</span>
+                            <p class="text-gray-600">Rigorous preparation for board exams and comprehensive subject mastery.</p>
+                        </div>
+                        <div class="md:w-2/3 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="bg-white p-5 rounded-xl shadow-sm border-l-4 border-l-brand-blue flex items-center hover:-translate-y-1 transition-transform"><span class="font-medium text-gray-800">Board exam preparation</span></div>
+                            <div class="bg-white p-5 rounded-xl shadow-sm border-l-4 border-l-brand-blue flex items-center hover:-translate-y-1 transition-transform"><span class="font-medium text-gray-800">Subject mastery programs</span></div>
+                            <div class="bg-white p-5 rounded-xl shadow-sm border-l-4 border-l-brand-blue flex items-center hover:-translate-y-1 transition-transform"><span class="font-medium text-gray-800">Revision & practice</span></div>
+                            <div class="bg-white p-5 rounded-xl shadow-sm border-l-4 border-l-brand-blue flex items-center hover:-translate-y-1 transition-transform"><span class="font-medium text-gray-800">Individual mentoring</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Plus One/Two Content -->
+                <div id="plus" class="tab-content z-10 relative">
+                    <div class="flex flex-col md:flex-row items-center gap-10">
+                        <div class="md:w-1/3">
+                            <div class="w-24 h-24 bg-blue-100 rounded-2xl flex items-center justify-center mb-6 shadow-inner transform -rotate-6">
+                                <i class="fas fa-chart-line text-5xl text-brand-blue"></i>
+                            </div>
+                            <h3 class="text-3xl font-bold text-gray-900 mb-2">Plus One & Two</h3>
+                            <p class="text-gray-600">Specialized stream support guiding students toward their ideal career paths.</p>
+                        </div>
+                        <div class="md:w-2/3 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-50 group hover:-translate-y-1 transition-transform">
+                                <i class="fas fa-atom text-2xl text-blue-500 mb-2 block"></i>
+                                <span class="font-medium text-gray-800">Science, Commerce, Arts</span>
+                            </div>
+                            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-50 group hover:-translate-y-1 transition-transform">
+                                <i class="fas fa-bullseye text-2xl text-red-500 mb-2 block"></i>
+                                <span class="font-medium text-gray-800">Exam-oriented coaching</span>
+                            </div>
+                            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-50 group hover:-translate-y-1 transition-transform">
+                                <i class="fas fa-project-diagram text-2xl text-green-500 mb-2 block"></i>
+                                <span class="font-medium text-gray-800">Project guidance</span>
+                            </div>
+                            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-50 group hover:-translate-y-1 transition-transform">
+                                <i class="fas fa-road text-2xl text-yellow-500 mb-2 block"></i>
+                                <span class="font-medium text-gray-800">Career & college prep</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Degree Content -->
+                <div id="degree" class="tab-content z-10 relative">
+                    <div class="flex flex-col md:flex-row items-center gap-10">
+                        <div class="md:w-1/3">
+                            <div class="w-24 h-24 bg-blue-100 rounded-2xl flex items-center justify-center mb-6 shadow-inner transform -rotate-6">
+                                <i class="fas fa-university text-5xl text-brand-blue"></i>
+                            </div>
+                            <h3 class="text-3xl font-bold text-gray-900 mb-2">Degree Level</h3>
+                            <p class="text-gray-600">Advanced tutoring and skill development for university success.</p>
+                        </div>
+                        <div class="md:w-2/3 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-50 flex items-center"><div class="w-10 h-10 rounded-full bg-blue-50 text-brand-blue flex items-center justify-center mr-3"><i class="fas fa-book"></i></div> <span class="font-medium text-gray-800">Subject tutoring</span></div>
+                            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-50 flex items-center"><div class="w-10 h-10 rounded-full bg-blue-50 text-brand-blue flex items-center justify-center mr-3"><i class="fas fa-user-tie"></i></div> <span class="font-medium text-gray-800">Academic mentoring</span></div>
+                            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-50 flex items-center"><div class="w-10 h-10 rounded-full bg-blue-50 text-brand-blue flex items-center justify-center mr-3"><i class="fas fa-laptop-code"></i></div> <span class="font-medium text-gray-800">Assignment assistance</span></div>
+                            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-50 flex items-center"><div class="w-10 h-10 rounded-full bg-blue-50 text-brand-blue flex items-center justify-center mr-3"><i class="fas fa-comments"></i></div> <span class="font-medium text-gray-800">Communication skills</span></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Madrasa Support Section -->
+    <section id="madrasa" class="py-24 bg-brand-emeraldLight relative overflow-hidden">
+        <!-- Modern Geometric Pattern -->
+        <div class="absolute inset-0 opacity-5 pointer-events-none" style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23059669\' fill-opacity=\'1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center mb-16 reveal">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-100 text-brand-emerald mb-4 animate-bounce" style="animation-duration: 3s;">
+                    <i class="fas fa-moon text-3xl"></i>
+                </div>
+                <h2 class="text-3xl md:text-5xl font-bold text-gray-900 mb-4">Madrasa Support</h2>
+                <div class="w-24 h-1.5 bg-brand-emerald mx-auto rounded-full mb-6"></div>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">Structured, comprehensive support nurturing both linguistic and spiritual growth in a supportive environment.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10">
+                <!-- Arabic Language -->
+                <div class="bg-white rounded-3xl p-8 shadow-md border-t-4 border-brand-emerald hover:-translate-y-2 hover:shadow-xl transition-all duration-300 reveal delay-100">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-2xl font-bold text-gray-900">Arabic Language</h3>
+                        <div class="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center text-brand-emerald text-xl"><i class="fas fa-language"></i></div>
+                    </div>
+                    <ul class="space-y-3">
+                        <li class="flex items-center text-gray-700 bg-gray-50 p-2.5 rounded-lg hover:bg-emerald-50 transition-colors"><div class="w-2 h-2 bg-brand-emerald rounded-full mr-3"></div> <span class="font-medium">Reading & Writing mastery</span></li>
+                        <li class="flex items-center text-gray-700 bg-gray-50 p-2.5 rounded-lg hover:bg-emerald-50 transition-colors"><div class="w-2 h-2 bg-brand-emerald rounded-full mr-3"></div> <span class="font-medium">Vocabulary development</span></li>
+                        <li class="flex items-center text-gray-700 bg-gray-50 p-2.5 rounded-lg hover:bg-emerald-50 transition-colors"><div class="w-2 h-2 bg-brand-emerald rounded-full mr-3"></div> <span class="font-medium">Grammar fundamentals</span></li>
+                        <li class="flex items-center text-gray-700 bg-gray-50 p-2.5 rounded-lg hover:bg-emerald-50 transition-colors"><div class="w-2 h-2 bg-brand-emerald rounded-full mr-3"></div> <span class="font-medium">Speaking & comprehension</span></li>
+                    </ul>
+                </div>
+
+                <!-- Quran Learning -->
+                <div class="bg-white rounded-3xl p-8 shadow-md border-t-4 border-brand-emerald hover:-translate-y-2 hover:shadow-xl transition-all duration-300 reveal delay-200">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-2xl font-bold text-gray-900">Quran Learning</h3>
+                        <div class="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center text-brand-emerald text-xl"><i class="fas fa-book-open"></i></div>
+                    </div>
+                    <ul class="space-y-3">
+                        <li class="flex items-center text-gray-700 bg-gray-50 p-2.5 rounded-lg hover:bg-emerald-50 transition-colors"><div class="w-2 h-2 bg-brand-emerald rounded-full mr-3"></div> <span class="font-medium">Noorani Qaida & Tajweed</span></li>
+                        <li class="flex items-center text-gray-700 bg-gray-50 p-2.5 rounded-lg hover:bg-emerald-50 transition-colors"><div class="w-2 h-2 bg-brand-emerald rounded-full mr-3"></div> <span class="font-medium">Memorization (Hifz) support</span></li>
+                        <li class="flex items-center text-gray-700 bg-gray-50 p-2.5 rounded-lg hover:bg-emerald-50 transition-colors"><div class="w-2 h-2 bg-brand-emerald rounded-full mr-3"></div> <span class="font-medium">Pronunciation improvement</span></li>
+                        <li class="flex items-center text-gray-700 bg-gray-50 p-2.5 rounded-lg hover:bg-emerald-50 transition-colors"><div class="w-2 h-2 bg-brand-emerald rounded-full mr-3"></div> <span class="font-medium">Structured revision programs</span></li>
+                    </ul>
+                </div>
+
+                <!-- Islamic Studies -->
+                <div class="bg-white rounded-3xl p-8 shadow-md border-t-4 border-brand-emerald hover:-translate-y-2 hover:shadow-xl transition-all duration-300 reveal delay-100">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-2xl font-bold text-gray-900">Islamic Studies</h3>
+                        <div class="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center text-brand-emerald text-xl"><i class="fas fa-star-and-crescent"></i></div>
+                    </div>
+                    <ul class="space-y-3">
+                        <li class="flex items-center text-gray-700 bg-gray-50 p-2.5 rounded-lg hover:bg-emerald-50 transition-colors"><div class="w-2 h-2 bg-brand-emerald rounded-full mr-3"></div> <span class="font-medium">Aqeedah & Fiqh</span></li>
+                        <li class="flex items-center text-gray-700 bg-gray-50 p-2.5 rounded-lg hover:bg-emerald-50 transition-colors"><div class="w-2 h-2 bg-brand-emerald rounded-full mr-3"></div> <span class="font-medium">Seerah & Islamic History</span></li>
+                        <li class="flex items-center text-gray-700 bg-gray-50 p-2.5 rounded-lg hover:bg-emerald-50 transition-colors"><div class="w-2 h-2 bg-brand-emerald rounded-full mr-3"></div> <span class="font-medium">Duas & Daily practices</span></li>
+                        <li class="flex items-center text-gray-700 bg-gray-50 p-2.5 rounded-lg hover:bg-emerald-50 transition-colors"><div class="w-2 h-2 bg-brand-emerald rounded-full mr-3"></div> <span class="font-medium">Moral & Character education</span></li>
+                    </ul>
+                </div>
+
+                <!-- Madrasa Exams -->
+                <div class="bg-white rounded-3xl p-8 shadow-md border-t-4 border-brand-emerald hover:-translate-y-2 hover:shadow-xl transition-all duration-300 reveal delay-200">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-2xl font-bold text-gray-900">Exam Preparation</h3>
+                        <div class="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center text-brand-emerald text-xl"><i class="fas fa-clipboard-check"></i></div>
+                    </div>
+                    <ul class="space-y-3">
+                        <li class="flex items-center text-gray-700 bg-gray-50 p-2.5 rounded-lg hover:bg-emerald-50 transition-colors"><div class="w-2 h-2 bg-brand-emerald rounded-full mr-3"></div> <span class="font-medium">Thorough lesson revision</span></li>
+                        <li class="flex items-center text-gray-700 bg-gray-50 p-2.5 rounded-lg hover:bg-emerald-50 transition-colors"><div class="w-2 h-2 bg-brand-emerald rounded-full mr-3"></div> <span class="font-medium">Mock tests & preparation</span></li>
+                        <li class="flex items-center text-gray-700 bg-gray-50 p-2.5 rounded-lg hover:bg-emerald-50 transition-colors"><div class="w-2 h-2 bg-brand-emerald rounded-full mr-3"></div> <span class="font-medium">Individual, focused guidance</span></li>
+                        <li class="flex items-center text-gray-700 bg-gray-50 p-2.5 rounded-lg hover:bg-emerald-50 transition-colors"><div class="w-2 h-2 bg-brand-emerald rounded-full mr-3"></div> <span class="font-medium">Continuous progress tracking</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="py-24 bg-white border-t border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 reveal">
+                <h2 class="text-3xl md:text-5xl font-bold text-gray-900 mb-4">Beyond the Classroom</h2>
+                <div class="w-24 h-1.5 bg-brand-blue mx-auto rounded-full mb-6"></div>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">Discover the comprehensive support ecosystem SKILLO offers to guarantee student well-being and academic success.</p>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 reveal delay-100">
+                <div class="bg-gray-50 rounded-2xl p-6 text-center hover:bg-brand-blue hover:text-white transition-colors duration-300 group cursor-default shadow-sm border border-gray-100">
+                    <i class="fas fa-file-alt text-3xl text-brand-blue mb-4 group-hover:text-white transition-colors"></i>
+                    <h4 class="font-semibold text-sm">Personalized Assessments</h4>
+                </div>
+                <div class="bg-gray-50 rounded-2xl p-6 text-center hover:bg-brand-blue hover:text-white transition-colors duration-300 group cursor-default shadow-sm border border-gray-100">
+                    <i class="fas fa-route text-3xl text-brand-blue mb-4 group-hover:text-white transition-colors"></i>
+                    <h4 class="font-semibold text-sm">Individual Learning Plans</h4>
+                </div>
+                <div class="bg-gray-50 rounded-2xl p-6 text-center hover:bg-brand-blue hover:text-white transition-colors duration-300 group cursor-default shadow-sm border border-gray-100">
+                    <i class="fas fa-hands-helping text-3xl text-brand-blue mb-4 group-hover:text-white transition-colors"></i>
+                    <h4 class="font-semibold text-sm">Special Needs Support</h4>
+                </div>
+                <div class="bg-gray-50 rounded-2xl p-6 text-center hover:bg-brand-blue hover:text-white transition-colors duration-300 group cursor-default shadow-sm border border-gray-100">
+                    <i class="fas fa-comments text-3xl text-brand-blue mb-4 group-hover:text-white transition-colors"></i>
+                    <h4 class="font-semibold text-sm">Parent Consultations</h4>
+                </div>
+                <div class="bg-gray-50 rounded-2xl p-6 text-center hover:bg-brand-blue hover:text-white transition-colors duration-300 group cursor-default shadow-sm border border-gray-100">
+                    <i class="fas fa-laptop-house text-3xl text-brand-blue mb-4 group-hover:text-white transition-colors"></i>
+                    <h4 class="font-semibold text-sm">Online & Offline Options</h4>
+                </div>
+                <div class="bg-gray-50 rounded-2xl p-6 text-center hover:bg-brand-blue hover:text-white transition-colors duration-300 group cursor-default shadow-sm border border-gray-100">
+                    <i class="fas fa-calendar-alt text-3xl text-brand-blue mb-4 group-hover:text-white transition-colors"></i>
+                    <h4 class="font-semibold text-sm">Flexible Scheduling</h4>
+                </div>
+                <div class="bg-gray-50 rounded-2xl p-6 text-center hover:bg-brand-blue hover:text-white transition-colors duration-300 group cursor-default shadow-sm border border-gray-100">
+                    <i class="fas fa-heart text-3xl text-brand-blue mb-4 group-hover:text-white transition-colors"></i>
+                    <h4 class="font-semibold text-sm">Motivation Programs</h4>
+                </div>
+                <div class="bg-gray-50 rounded-2xl p-6 text-center hover:bg-brand-blue hover:text-white transition-colors duration-300 group cursor-default shadow-sm border border-gray-100">
+                    <i class="fas fa-hourglass-half text-3xl text-brand-blue mb-4 group-hover:text-white transition-colors"></i>
+                    <h4 class="font-semibold text-sm">Time Management</h4>
+                </div>
+                <div class="bg-gray-50 rounded-2xl p-6 text-center hover:bg-brand-blue hover:text-white transition-colors duration-300 group cursor-default shadow-sm border border-gray-100 lg:col-span-2 flex flex-col justify-center">
+                    <i class="fas fa-chart-line text-3xl text-brand-blue mb-4 group-hover:text-white transition-colors"></i>
+                    <h4 class="font-semibold text-sm">Continuous Progress Monitoring</h4>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Prominent Enrollment / Registration Section (Form Access) -->
+    <section id="enroll" class="py-24 bg-brand-dark text-white relative">
+        <div class="absolute right-0 top-0 w-1/2 h-full bg-brand-blue hidden lg:block opacity-20 rounded-l-full pointer-events-none"></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="flex flex-col lg:flex-row gap-16 items-center">
+                
+                <!-- Left: Contact & Info -->
+                <div class="lg:w-1/2 reveal">
+                    <span class="text-brand-emerald font-bold tracking-wider uppercase text-sm mb-3 block">Join Skillo</span>
+                    <h2 class="text-4xl md:text-5xl font-bold mb-6">Start Your Educational Journey Today.</h2>
+                    <p class="text-gray-400 text-lg mb-10 leading-relaxed">Please click the button to securely fill out our official registration form. Our academic advisors will review your details and contact you shortly.</p>
+                    
+                    <div class="space-y-6">
+                        <div class="flex items-center bg-white/5 p-4 rounded-2xl border border-white/10">
+                            <div class="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center mr-4 shadow-inner">
+                                <i class="fas fa-phone-alt text-brand-emerald"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-400 font-medium">Support Number</p>
+                                <a href="tel:7510863624" class="font-bold text-xl hover:text-brand-emerald transition-colors">7510 863 624</a>
+                            </div>
+                        </div>
+                        <div class="flex items-center bg-white/5 p-4 rounded-2xl border border-white/10">
+                            <div class="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mr-4 shadow-inner">
+                                <i class="fab fa-whatsapp text-green-400 text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-400 font-medium">WhatsApp Chat</p>
+                                <a href="https://wa.me/917510863624" target="_blank" rel="noopener noreferrer" class="font-bold text-lg hover:text-green-400 transition-colors">Message us directly</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right: Massive Form CTA -->
+                <div class="lg:w-1/2 w-full reveal delay-100">
+                    <div class="bg-white rounded-[2.5rem] p-10 shadow-2xl text-gray-800 relative overflow-hidden text-center transform hover:scale-[1.02] transition-transform duration-500">
+                        <div class="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/5/5b/Google_Forms_2020_Logo.svg" alt="Google Forms" class="w-12 h-12 opacity-90">
+                        </div>
+                        <h3 class="text-3xl font-bold mb-4">Registration Form</h3>
+                        <p class="text-gray-500 mb-8 text-lg font-medium">Please fill out our official Google Form to provide your details. It's quick and easy.</p>
+                        
+                        <a href="https://forms.gle/E7SHUnpi4fDL3iUh8" target="_blank" rel="noopener noreferrer" class="inline-flex w-full bg-brand-blue text-white py-5 px-8 rounded-2xl font-bold text-xl hover:bg-blue-700 transition-all shadow-[0_10px_25px_rgba(30,58,138,0.3)] items-center justify-center group">
+                            Open Registration Form 
+                            <i class="fas fa-external-link-alt ml-3 transform group-hover:scale-110 transition-transform"></i>
+                        </a>
+                        
+                        <p class="text-sm text-gray-400 mt-6 font-medium"><i class="fas fa-shield-alt text-brand-emerald mr-1"></i> Your information is secure and confidential.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-950 text-gray-400 py-12 border-t border-gray-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="text-center md:text-left">
+                <span class="text-2xl font-bold text-white tracking-tight">SKILLO<span class="text-brand-emerald">.</span></span>
+                <p class="text-sm mt-2 max-w-sm mx-auto md:mx-0">Academic Excellence, Arabic Learning, Islamic Education, and Personalized Support.</p>
+            </div>
+            
+            <div class="flex space-x-6">
+                <a href="#" class="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center hover:bg-brand-blue hover:text-white transition-all transform hover:scale-110"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center hover:bg-brand-blue hover:text-white transition-all transform hover:scale-110"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center hover:bg-brand-blue hover:text-white transition-all transform hover:scale-110"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Interactive Scripts -->
+    <script>
+        // Mobile Menu Toggle
+        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+            var menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        });
+
+        // Close mobile menu on link click
+        document.querySelectorAll('.mobile-link').forEach(link => {
+            link.addEventListener('click', () => {
+                document.getElementById('mobile-menu').classList.add('hidden');
+            });
+        });
+
+        // Typing Effect in Hero
+        const words = ["Learning", "Madrasa Support", "Skill Development", "Mentorship"];
+        let i = 0;
+        let timer;
+        let isDeleting = false;
+        let currentWord = "";
+        let charIndex = 0;
+
+        function typeEffect() {
+            const word = words[i];
+            
+            if (isDeleting) {
+                currentWord = word.substring(0, charIndex - 1);
+                charIndex--;
+            } else {
+                currentWord = word.substring(0, charIndex + 1);
+                charIndex++;
+            }
+
+            document.getElementById("typewriter").textContent = currentWord;
+
+            let typingSpeed = isDeleting ? 40 : 80;
+
+            if (!isDeleting && currentWord === word) {
+                typingSpeed = 2000; // Pause at end of word
+                isDeleting = true;
+            } else if (isDeleting && currentWord === "") {
+                isDeleting = false;
+                i = (i + 1) % words.length; // Next word
+                typingSpeed = 500; // Pause before typing next word
+            }
+
+            setTimeout(typeEffect, typingSpeed);
+        }
+        setTimeout(typeEffect, 1000);
+
+        // Academic Tabs Logic
+        function openTab(tabId) {
+            // Hide all contents
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            // Reset all buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-brand-blue', 'text-white', 'shadow-md');
+                btn.classList.add('text-gray-600', 'hover:bg-gray-100');
+                
+                // Ensure icons revert to standard color
+                const icon = btn.querySelector('i');
+                if(icon) {
+                    if(icon.classList.contains('text-yellow-300')) icon.classList.replace('text-yellow-300', 'text-brand-blue');
+                }
+            });
+
+            // Show selected content
+            document.getElementById(tabId).classList.add('active');
+            
+            // Highlight active button
+            const activeBtn = document.getElementById('btn-' + tabId);
+            activeBtn.classList.remove('text-gray-600', 'hover:bg-gray-100');
+            activeBtn.classList.add('bg-brand-blue', 'text-white', 'shadow-md');
+            
+            // Special color for active KG icon
+            if(tabId === 'kg') {
+                activeBtn.querySelector('i').classList.replace('text-brand-blue', 'text-yellow-300');
+            }
+        }
+
+        // Scroll Reveal Animation
+        function reveal() {
+            var reveals = document.querySelectorAll(".reveal");
+            for (var i = 0; i < reveals.length; i++) {
+                var windowHeight = window.innerHeight;
+                var elementTop = reveals[i].getBoundingClientRect().top;
+                var elementVisible = 100;
+
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[i].classList.add("active");
+                }
+            }
+        }
+        window.addEventListener("scroll", reveal);
+        reveal(); // Trigger on load
+    </script>
+</body>
+</html>
